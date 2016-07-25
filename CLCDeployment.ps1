@@ -182,21 +182,25 @@ $networkID = Read-Host "Please copy and paste the ID of the network you wish to 
 
 #Get desired CPU count
 $cpu = Read-Host "Please enter the number of CPUs for the servers to have, up to 16"
+$cpu = [int]$cpu
 if ($cpu -gt 16)
 {
     DO
     {
         $cpu = Read-Host "Please enter the number of CPUs for the servers to have, up to 16"
+        $cpu = [int]$cpu
     } While ($cpu -gt 16)
 }
 
 # Get desired RAM amount
 $memoryGB = Read-Host "Please enter the amount of RAM you wish the machines to have, up to 128 GB"
+$memoryGB = [int]$memoryGB
 if ($memoryGB -gt 128)
 {
     DO
     {
         $memoryGB = Read-Host "Please enter the amount of RAM you wish the machines to have, up to 128 GB"
+        $memoryGB = [int]$memoryGB
     } While ($memoryGB -gt 128)
 }
 
@@ -215,7 +219,7 @@ if ($DNSName.length -gt 6)
 
 # Create the JSON body
 
-$JSON = @{name = $DNSName; description = "API server created by $name"; groupID = $groupID; networkID = $networkID; sourceServerId = $sourceServerID; cpu = $cpu; memoryGB = $memoryGB; type = $type} | ConvertTo-Json
+$JSON = @{name = $DNSName; description = "API server created by $name"; groupID = $groupID; networkID = $networkID; sourceServerId = $sourceServerID; cpu = "$cpu"; memoryGB = "$memoryGB"; type = $type} | ConvertTo-Json
 
 # Set the URL for the server creation API Call. Don't change this.
 
@@ -290,7 +294,6 @@ Add-Content $filename "$datetime - Creation of $total servers requested by $name
 
 # Begin Main Operation
 Write-Verbose "$datetime - Beginning creation of $total servers requested by $name - Template: $sourceServerID | Group: $groupID | CPUs: $cpu | RAM: $memoryGB | Name: $DNSName"
-
 DO
 {
     $retry = 0
@@ -345,7 +348,7 @@ DO
                     $networkCheck = $false
                 }
             } # end while not networkcheck
-            $JSON = @{name = $DNSName; description = "API server created by $name"; groupID = $groupID; networkID = $networkID; sourceServerId = $sourceServerID; cpu = $cpu; memoryGB = $memoryGB; type = $type} | ConvertTo-Json
+            $JSON = @{name = $DNSName; description = "API server created by $name"; groupID = $groupID; networkID = $networkID; sourceServerId = $sourceServerID; cpu = "$cpu"; memoryGB = "$memoryGB"; type = $type} | ConvertTo-Json
             $result = Invoke-RestMethod -Uri $url -ContentType "Application/JSON" -Headers $HeaderValue -Body $JSON -Method Post
             $completed = $true
             $statusURL = "https://api.ctl.io" + $result.links.href[0]
